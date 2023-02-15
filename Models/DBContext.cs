@@ -15,5 +15,7 @@ namespace la_brisa.Models
         }
 
         public DbSet<User> Users { get; set; }
+
+        public DbSet<Holiday> Holidays { get; set; }
     }
 }

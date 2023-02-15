@@ -6,6 +6,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Newtonsoft.Json.Linq;
+using System.Security.Cryptography;
+using System.Text;
+using System.Security.Policy;
 
 namespace la_brisa.Controllers
 {
@@ -28,10 +31,8 @@ namespace la_brisa.Controllers
             return await _iuser.Get();
 
         }
-
+        [Route("signup")]
         [HttpPost]
-       
-
         public async Task<bool> Post([FromForm] User user)
         {
             //string path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", file.FileName);
@@ -55,10 +56,10 @@ namespace la_brisa.Controllers
                 {
                     sb.Append(hashBytes[i].ToString("X2"));
                 }
-                hashPassword =  sb.ToString();
+                hashPassword = sb.ToString();
             }
 
-            
+
 
             SqlConnection conn = new SqlConnection(@"Server=DESKTOP-OFRUC79;database=la_brisa;integrated security=true");
             string sqlExists = "select Email from dbo.Users where Email='" + user.Email + "'";
@@ -79,7 +80,7 @@ namespace la_brisa.Controllers
                 {
                     exists = "YES";
                 }
-                
+
 
             }
             conn.Close();
@@ -102,5 +103,114 @@ namespace la_brisa.Controllers
                 return false;
             }
         }
+
+        [Route("login")]
+        [HttpPost]
+        public async Task<string> Login([FromForm] Login user)
+        {
+
+
+
+            SqlConnection conn = new SqlConnection(@"Server=DESKTOP-OFRUC79;database=la_brisa;integrated security=true");
+            string sqlExists = "select Email, Password, Name, ProfilePicture, PhoneNumber from dbo.Users where Email='" + user.Email + "'";
+
+            SqlCommand sqlCommand = new SqlCommand(sqlExists, conn);
+            conn.Open();
+            SqlDataReader reader = sqlCommand.ExecuteReader();
+            string exists = "NO";
+            JObject job = new JObject();
+            while (reader.Read())
+            {
+
+                var password = reader["Password"].ToString();
+                var mobile = reader["PhoneNumber"].ToString();
+                var Name = reader["Name"].ToString();
+                var Picture = reader["ProfilePicture"].ToString();
+                Console.WriteLine(Name);
+                job.Add("Mobile", mobile);
+                job.Add("Name", Name);
+                job.Add("Picture", Picture);
+
+
+                string hashPassword = "";
+                using (System.Security.Cryptography.MD5 md5 = System.Security.Cryptography.MD5.Create())
+                {
+                    byte[] inputBytes = System.Text.Encoding.ASCII.GetBytes(user.Password);
+                    byte[] hashBytes = md5.ComputeHash(inputBytes);
+
+                    StringBuilder sb = new StringBuilder();
+                    for (int i = 0; i < hashBytes.Length; i++)
+                    {
+                        sb.Append(hashBytes[i].ToString("X2"));
+                    }
+                    hashPassword = sb.ToString();
+                }
+                Console.WriteLine(job);
+                if (password == hashPassword)
+                {
+                    exists = "YES";
+                    job.Add("exists", "YES");
+                }
+                else
+                {
+                    exists = "NO";
+                    job.Add("exists", "NO");
+                }
+
+
+
+
+
+            }
+
+
+
+            conn.Close();
+            if (exists == "YES")
+            {
+
+                return job.ToString();
+            }
+            else
+            {
+                return job.ToString();
+            }
+        }
+
+        [Route("add_holiday")]
+        [HttpPost]
+        public async Task<bool> AddHoliday([FromForm] Holiday holiday, IFormFile file)
+        {
+            string path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", file.FileName);
+
+            var fileName = Path.GetFileName(file.FileName);
+            var filePath = Path.Combine(Directory.GetCurrentDirectory(), "Media", fileName);
+            var file_name = "/Media/" + fileName;
+            using (var fileSrteam = new FileStream(filePath, FileMode.Create))
+            {
+                await file.CopyToAsync(fileSrteam);
+
+            }
+
+
+            SqlConnection conn = new SqlConnection(@"Server=DESKTOP-OFRUC79;database=la_brisa;integrated security=true");
+            string query = "insert into Holidays values(@HolidayName,@Location, @StartDate, @EndDate, @Price, @Image)";
+            SqlCommand cmd = new SqlCommand(query, conn);
+            cmd.Parameters.Add(new SqlParameter("@HolidayName", holiday.HolidayName));
+            cmd.Parameters.Add(new SqlParameter("@Location", holiday.Location));
+            cmd.Parameters.Add(new SqlParameter("@StartDate", holiday.StartDate));
+            cmd.Parameters.Add(new SqlParameter("@EndDate", holiday.EndDate));
+            cmd.Parameters.Add(new SqlParameter("@Price", holiday.Price));
+            cmd.Parameters.Add(new SqlParameter("@Image", file_name));
+
+            conn.Open();
+            int noOfRowsAffected = cmd.ExecuteNonQuery();
+            conn.Close();
+            return noOfRowsAffected > 0 ? true : false;
+
+        
+    
+        }
+
     }
 }

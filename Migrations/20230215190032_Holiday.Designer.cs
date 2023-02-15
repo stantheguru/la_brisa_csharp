@@ -11,8 +11,8 @@ using la_brisa.Models;
 namespace la_brisa.Migrations
 {
     [DbContext(typeof(DBContext))]
-    [Migration("20230208152603_users")]
-    partial class users
+    [Migration("20230215190032_Holiday")]
+    partial class Holiday
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -22,6 +22,42 @@ namespace la_brisa.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
+
+            modelBuilder.Entity("la_brisa.Models.Holiday", b =>
+                {
+                    b.Property<int>("HolidayID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("HolidayID"), 1L, 1);
+
+                    b.Property<string>("EndDate")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("HolidayName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Image")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Location")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Price")
+                        .HasColumnType("int");
+
+                    b.Property<string>("StartDate")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("HolidayID");
+
+                    b.ToTable("Holidays");
+                });
 
             modelBuilder.Entity("la_brisa.Models.User", b =>
                 {
