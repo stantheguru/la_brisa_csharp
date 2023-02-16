@@ -9,6 +9,7 @@ using Newtonsoft.Json.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Security.Policy;
+using System.ComponentModel;
 
 namespace la_brisa.Controllers
 {
@@ -177,15 +178,53 @@ namespace la_brisa.Controllers
             }
         }
 
+
+        //fetch holidays
+        [Route("holidays")]
+        [HttpGet]
+        public async Task<string> Holidays()
+        {
+             
+            SqlConnection conn = new SqlConnection(@"Server=DESKTOP-OFRUC79;database=la_brisa;integrated security=true");
+            string sqlHolidays = "select * from dbo.Holidays";
+
+            SqlCommand sqlCommand = new SqlCommand(sqlHolidays, conn);
+            conn.Open();
+            SqlDataReader reader = sqlCommand.ExecuteReader();
+            JArray jarray = new JArray();
+            while (reader.Read())
+            {
+
+                JObject job = new JObject();
+                job.Add("HolidayName", reader["HolidayName"].ToString());
+                job.Add("Location", reader["Location"].ToString());
+                job.Add("StartDate", reader["StartDate"].ToString());
+                job.Add("EndDate", reader["EndDate"].ToString());
+                job.Add("Price", reader["Price"].ToString());
+                job.Add("Image", reader["Image"].ToString());
+                jarray.Add(job);
+
+            }
+
+            Console.WriteLine(jarray);
+
+            conn.Close();
+            
+
+                return jarray.ToString();
+            
+        }
+
+
         [Route("add_holiday")]
         [HttpPost]
         public async Task<bool> AddHoliday([FromForm] Holiday holiday, IFormFile file)
         {
-            string path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", file.FileName);
 
             var fileName = Path.GetFileName(file.FileName);
-            var filePath = Path.Combine(Directory.GetCurrentDirectory(), "Media", fileName);
-            var file_name = "/Media/" + fileName;
+            var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images", fileName);
+            Console.WriteLine(filePath);
+            var file_name = "/images/" + fileName;
             using (var fileSrteam = new FileStream(filePath, FileMode.Create))
             {
                 await file.CopyToAsync(fileSrteam);

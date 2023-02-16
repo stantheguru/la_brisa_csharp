@@ -262,3 +262,4 @@ E:\Projects\sharp\la_brisa\obj\Debug\net6.0\refint\la_brisa.dll
 E:\Projects\sharp\la_brisa\obj\Debug\net6.0\la_brisa.pdb
 E:\Projects\sharp\la_brisa\obj\Debug\net6.0\la_brisa.genruntimeconfig.cache
 E:\Projects\sharp\la_brisa\obj\Debug\net6.0\ref\la_brisa.dll
+E:\Projects\sharp\la_brisa\bin\Debug\net6.0\la_brisa.staticwebassets.runtime.json
