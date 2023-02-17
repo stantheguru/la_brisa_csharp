@@ -1,6 +1,5 @@
 ﻿using System.Security.Cryptography;
 using System.Text;
-using la_brisa.DBOperations;
 using la_brisa.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -17,21 +16,11 @@ namespace la_brisa.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        private readonly IUser _iuser;
-        public UserController(IUser iuser)
-        {
-            _iuser = iuser;
-        }
+        
 
         [HttpGet]
 
-        public async Task<IEnumerable<User>> GetUsers()
-
-        {
-
-            return await _iuser.Get();
-
-        }
+      
         [Route("signup")]
         [HttpPost]
         public async Task<bool> Post([FromForm] User user)
@@ -179,6 +168,26 @@ namespace la_brisa.Controllers
         }
 
 
+        [Route("delete")]
+        [HttpPost]
+        public async Task<bool> Delete([FromForm] HolidayFilter holiday)
+        {
+
+
+
+            SqlConnection conn = new SqlConnection(@"Server=DESKTOP-OFRUC79;database=la_brisa;integrated security=true");
+            string sqlDelete = "DELETE from  dbo.Holidays where HolidayID='" + holiday.HolidayID + "'";
+
+            SqlCommand sqlCommand = new SqlCommand(sqlDelete, conn);
+            conn.Open();
+            int noOfRowsAffected = sqlCommand.ExecuteNonQuery();
+            conn.Close();
+            return noOfRowsAffected > 0 ? true : false;
+
+        }
+
+
+
         //fetch holidays
         [Route("holidays")]
         [HttpGet]
@@ -202,6 +211,7 @@ namespace la_brisa.Controllers
                 job.Add("EndDate", reader["EndDate"].ToString());
                 job.Add("Price", reader["Price"].ToString());
                 job.Add("Image", reader["Image"].ToString());
+                job.Add("HolidayID", reader["HolidayID"].ToString());
                 jarray.Add(job);
 
             }
@@ -214,6 +224,45 @@ namespace la_brisa.Controllers
                 return jarray.ToString();
             
         }
+
+        //holiday details
+        [Route("holiday_details")]
+        [HttpPost]
+        public async Task<string> HolidayDetails([FromForm] HolidayFilter holiday)
+        {
+
+            SqlConnection conn = new SqlConnection(@"Server=DESKTOP-OFRUC79;database=la_brisa;integrated security=true");
+            string sqlHolidays = "select * from dbo.Holidays where HolidayID = '"+holiday.HolidayID+"'";
+
+            SqlCommand sqlCommand = new SqlCommand(sqlHolidays, conn);
+            conn.Open();
+            SqlDataReader reader = sqlCommand.ExecuteReader();
+            JObject job = new JObject();
+            while (reader.Read())
+            {
+
+               
+                job.Add("HolidayName", reader["HolidayName"].ToString());
+                job.Add("Location", reader["Location"].ToString());
+                job.Add("StartDate", reader["StartDate"].ToString());
+                job.Add("EndDate", reader["EndDate"].ToString());
+                job.Add("Price", reader["Price"].ToString());
+                job.Add("Image", reader["Image"].ToString());
+                job.Add("HolidayID", reader["HolidayID"].ToString());
+                
+
+            }
+
+           
+
+            conn.Close();
+
+
+            return job.ToString();
+
+        }
+
+
 
 
         [Route("add_holiday")]

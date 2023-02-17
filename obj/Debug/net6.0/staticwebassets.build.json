@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "mh463DnOeuibENyvo/pGy5oit7GirY3lMKKq74r8jL0=",
+  "Hash": "HWXLjWSGlVR1v44RPVhTF9mi94H+FO9tJ7Odx66seSY=",
   "Source": "la_brisa",
   "BasePath": "_content/la_brisa",
   "Mode": "Default",
@@ -16,6 +16,23 @@
     }
   ],
   "Assets": [
+    {
+      "Identity": "E:\\Projects\\sharp\\la_brisa\\wwwroot\\images\\37a124eaf767_portrait.jpg",
+      "SourceId": "la_brisa",
+      "SourceType": "Discovered",
+      "ContentRoot": "E:\\Projects\\sharp\\la_brisa\\wwwroot\\",
+      "BasePath": "_content/la_brisa",
+      "RelativePath": "images/37a124eaf767_portrait.jpg",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\images\\37a124eaf767_portrait.jpg"
+    },
     {
       "Identity": "E:\\Projects\\sharp\\la_brisa\\wwwroot\\images\\app design.png",
       "SourceId": "la_brisa",
