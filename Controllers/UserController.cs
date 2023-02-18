@@ -300,5 +300,71 @@ namespace la_brisa.Controllers
     
         }
 
+        [Route("update_profile")]
+        [HttpPost]
+        public async Task<bool> UpdateProfile([FromForm] UserUpdate user, IFormFile file)
+        {
+
+            var fileName = Path.GetFileName(file.FileName);
+            var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images", fileName);
+            Console.WriteLine(filePath);
+            var file_name = "/images/" + fileName;
+            using (var fileSrteam = new FileStream(filePath, FileMode.Create))
+            {
+                await file.CopyToAsync(fileSrteam);
+
+            }
+
+            SqlConnection conn = new SqlConnection(@"Server=DESKTOP-OFRUC79;database=la_brisa;integrated security=true");
+            string query = "UPDATE dbo.Users SET ProfilePicture = @ProfilePicture WHERE Email = @Email";
+            SqlCommand cmd = new SqlCommand(query, conn);
+           
+            cmd.Parameters.Add(new SqlParameter("ProfilePicture", file_name));
+            cmd.Parameters.Add(new SqlParameter("@Email", user.Email));
+
+            conn.Open();
+            int noOfRowsAffected = cmd.ExecuteNonQuery();
+            conn.Close();
+            return noOfRowsAffected > 0 ? true : false;
+
+
+
+        }
+
+        //filer user
+        [Route("fetch_user")]
+        [HttpPost]
+        public async Task<string> FetchUser([FromForm] UserUpdate user)
+        {
+
+            SqlConnection conn = new SqlConnection(@"Server=DESKTOP-OFRUC79;database=la_brisa;integrated security=true");
+            string sqlUser = "select * from dbo.Users where Email = '" + user.Email + "'";
+
+            SqlCommand sqlCommand = new SqlCommand(sqlUser, conn);
+            conn.Open();
+            SqlDataReader reader = sqlCommand.ExecuteReader();
+            JObject job = new JObject();
+            while (reader.Read())
+            {
+
+
+                job.Add("ProfilePicture", reader["ProfilePicture"].ToString());
+
+
+            }
+
+
+
+            conn.Close();
+
+
+            return job.ToString();
+
+        }
+
+
+
+
+
     }
 }
